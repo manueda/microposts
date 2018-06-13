@@ -14,7 +14,8 @@
             </div>
         </div>
     </li>
+<! - Omission ->
 @endforeach
 </ul>
-
+{!! $users->render() !!}
 @endif

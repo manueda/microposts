@@ -9,8 +9,6 @@ use App\Micropost; // add
 
 class UsersController extends Controller
 {
-    
-    〜omit〜
 
     public function followings($id)
     {

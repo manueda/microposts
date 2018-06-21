@@ -8,11 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     use Notifiable;
-    
-    public function microposts()
-    {
-        return $this->hasMany(Micropost::class);
-    }
 
     /**
      * The attributes that are mass assignable.
@@ -32,6 +27,14 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
     
+
+
+    public function microposts()
+    {
+        return $this->hasMany(Micropost::class);
+    }
+    
+   
     
     public function followings()
     {
@@ -44,7 +47,7 @@ class User extends Authenticatable
     }
     
     public function follow($userId)
-    {
+{
     // confirm if already following
     $exist = $this->is_following($userId);
     // confirming that it is not you
@@ -59,8 +62,9 @@ class User extends Authenticatable
         return true;
     }
 }
-    public function unfollow($userId)
-    {
+
+public function unfollow($userId)
+{
     // confirming if already following
     $exist = $this->is_following($userId);
     // confirming that it is not you
@@ -78,17 +82,58 @@ class User extends Authenticatable
 }
 
 
-    public function is_following($userId) {
+public function is_following($userId) {
     return $this->followings()->where('follow_id', $userId)->exists();
-    }
-    
-    public function feed_microposts()
-    {
-        $follow_user_ids = $this->followings()-> pluck('users.id')->toArray();
-        $follow_user_ids[] = $this->id;
-        return Micropost::whereIn('user_id', $follow_user_ids);
-    }
-
-
 }
 
+ public function feed_microposts()
+    {
+        $follow_user_ids = $this->followings()-> pluck('users.id')->toArray();
+        $follow_user_ids[] = \Auth::id();
+        return Micropost::whereIn('user_id', $follow_user_ids);
+    }
+    
+    
+    
+    
+
+ public function favorites()
+    {
+        return $this->belongsToMany(Microposts::class, 'favorite', 'user_id', 'favo_id')->withTimestamps();
+    }
+    
+ public function favoru($micropostId)
+ {
+     $exist = $this->favotteru($micropostId);
+     
+     if ($exist){
+         return false;
+     }else{
+         $this->favorites()->attach($userId);
+         return true;
+     }
+ }     
+
+  public function unfavoru($micropostId)
+{
+    
+    $exist = $this->favotteru($micropostId);
+   
+
+    if ($exist) {
+        $this->favorites()->detach($micropostId);
+        return true;
+    } else {
+        // do nothing if not following
+        return false;
+    }
+} 
+
+public function favotteru($micropostId) {
+    return $this->favorites()->where('favo_id', $micropostId)->exists();
+}
+
+
+     
+     
+ }
